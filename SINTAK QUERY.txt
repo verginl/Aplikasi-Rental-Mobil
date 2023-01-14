@@ -1,0 +1,34 @@
+triger after delete insert (BATAL BOOKING)
+
+===============================================================================
+Triger apabila lunas hapus dari table booking
+IF (old.status_pembayaran = 'Lunas') then 
+INSERT INTO tbl_transaksi
+(id_booking,id_customer,id_mobil, tgl_sewa,tgl_kembali,jml_hari,tgl_booking, harga_sewa_total ,nominal_bayar, sisa_bayar, status_pembayaran, status_sewa, status_transaksi) VALUES (OLD.id_booking, OLD.id_customer,OLD.id_mobil, OLD.tgl_sewa,OLD.tgl_kembali,OLD.jml_hari,OLD.tgl_booking,OLD.harga_sewa_total ,OLD.nominal_bayar, OLD.sisa_bayar, OLD.status_pembayaran, 'Sedang Sewa','Belum Selesai' );
+elseif (old.status_pembayaran= 'Belum Lunas') then
+INSERT INTO tbl_transaksi
+(id_booking,id_customer,id_mobil, tgl_sewa,tgl_kembali,jml_hari,tgl_booking, harga_sewa_total ,nominal_bayar, sisa_bayar, status_pembayaran,tgl_selesai, status_sewa, status_transaksi) VALUES (OLD.id_booking, OLD.id_customer,OLD.id_mobil, OLD.tgl_sewa,OLD.tgl_kembali,OLD.jml_hari,OLD.tgl_booking, OLD.harga_sewa_total ,OLD.nominal_bayar, OLD.sisa_bayar, OLD.status_pembayaran,CURDATE(), 'Batal Sewa','Selesai' );
+
+UPDATE tbl_customer
+ SET status = 'Belum Sewa'
+ WHERE
+ id_customer = old.id_customer ;
+end if
+
+===========================================================================
+CREATE VIEW qw_booking AS
+SELECT tbl_booking .*, nama_customer,no_telepon,alamat,jk,nama_mobil,jenis_mobil,plat_nomor,warna_mobil,harga_sewa_perhari FROM tbl_booking
+INNER JOIN tbl_mobil ON tbl_mobil.id_mobil = tbl_booking.id_mobil
+INNER JOIN tbl_customer ON tbl_customer.id_customer = tbl_booking.id_customer
+
+============================================================================
+
+create view qw_transaksi AS
+SELECT tbl_transaksi .*, nama_customer,no_telepon,jk,alamat,nama_mobil,jenis_mobil,plat_nomor,warna_mobil,harga_sewa_perhari FROM tbl_transaksi
+INNER JOIN tbl_mobil ON tbl_mobil.id_mobil = tbl_transaksi.id_mobil
+INNER JOIN tbl_customer ON tbl_customer.id_customer = tbl_transaksi.id_customer
+
+=============================================================================
+
+
+
